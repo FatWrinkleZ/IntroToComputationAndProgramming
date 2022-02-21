@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>	// in case you want strlen()
 #include <math.h>	// in case you want abs()
-#ifdef WIN_32
+#ifdef WIN32
 #include <conio.h>
 #endif
 
@@ -33,6 +33,12 @@ void leave_game(char *);
 
 int main(int argc, char *argv[])
 {
+	#ifdef WIN32
+	printf("WINDOWS DETECTED : Setting Up With Windows Settings\n");
+	#else
+	printf("UNIX BASED SYSTEM DETECTED : SETTING UP WITH DEFAULTS\n");
+	#endif
+
 	char c;
 
 	init(argc, argv);
@@ -111,7 +117,7 @@ void init(int argc, char *argv[])
 	}
 	fprintf(stderr, "Init: Got user=[%d,%d] goal=[%d,%d]\n", u_x, u_y, g_x, g_y);
 
-	#ifdef WIN_32
+	#ifdef WIN32
 	return;
 	#endif
 	system ("/bin/stty raw");
@@ -120,7 +126,7 @@ void init(int argc, char *argv[])
 void leave_game(char *msg)
 {
 	fclose(fp);
-	#ifdef WIN_32
+	#ifdef WIN32
 	#else
 	system ("/bin/stty cooked");
 	#endif
