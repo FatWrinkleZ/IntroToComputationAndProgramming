@@ -29,7 +29,9 @@ void SpawnGoal();
 
 #define LINESIZ	96
 
-char *MAP;
+//char *MAP;
+
+char MAP[60][60];
 
 // movement controls -- feel free to redefine
 #define MOV_N	'w'		// move North/Up
@@ -56,14 +58,14 @@ int main(int argc, char *argv[])
 	static const int y;
 	fp = Level(argc, argv);
 	init(argc, fp);
-	SpawnGoal();
+	//SpawnGoal();
 	PlayLoop();
 	//leave_game("\nThanks for playing!\n");
 }
 
 void SpawnGoal(){
 	srand(time(0));
-	int x = 1+(rand()%totalSize);
+	int x = 3+(rand()%(totalSize-3));
 	if(MAP[x] == ']' || MAP[x] == '['){
 		SpawnGoal();
 	}
@@ -71,11 +73,11 @@ void SpawnGoal(){
 }
 
 void CheckForMovement(int dx, int dy){
-	int playerPos = (u_x + (xSize*u_y));
-	if((dx < 0 && u_x==0) || (dx > 0 && u_x == xSize)){
+	int playerPos = (u_x + ((xSize)*u_y));
+	if((dy == 0 && (dx < 0 && u_x==0)) || (dx > 0 && u_x == xSize)){
 		return;
 	}
-	if((dy < 0 && u_y == 0) || (dy > 0 && u_y == ySize)){
+	if(((dy < 0 && u_y == 0) || (dy > 0 && u_y == ySize))){
 		return;
 	}
 	char TOMOVE = MAP[playerPos + dx + (dy*xSize)];
@@ -115,7 +117,7 @@ void PlayLoop(){
 		break;
 		case MOV_N:
 			dy--;
-			dx++;
+			//dx++;
 		break;
 		case MOV_E:
 			dx++;
@@ -125,7 +127,7 @@ void PlayLoop(){
 		break;
 		case MOV_S:
 			dy++;
-			dx--;
+			//dx--;
 		break;
 		case '\n' : // newline -- ignore
 			// do nothing
@@ -148,7 +150,7 @@ void save_state()
 
 void refresh_screen()
 {
-	int playerPos = (u_x + (xSize*u_y));
+	int playerPos = (u_x + ((xSize)*u_y));
 	for(int i = 0; i < totalSize; i++){
 		if(i == playerPos){
 			printf("%c", 'P');
@@ -201,6 +203,7 @@ void init(int argc, FILE* fp)
 		strcat(MAP, buffer);
 		index++;
 	}
+	xSize-=2;
 	totalSize = index;
 	printf("SIZE = %d (X) & %d(Y)\n", xSize, ySize);
 	printf("%s", MAP);
@@ -212,6 +215,7 @@ void init(int argc, FILE* fp)
 
 void leave_game(char *msg)
 {
+	free(MAP);
 	fclose(fp);
 	#ifdef WIN32
 	#else

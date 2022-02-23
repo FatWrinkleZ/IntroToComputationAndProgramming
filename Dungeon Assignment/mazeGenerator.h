@@ -60,7 +60,7 @@ FILE* SerializeMaze(char *maze, int width, int height, char* argv1){
     //printf("Erroring Here");
    GenerateMaze(maze , width, height);
    int x, y;
-   fprintf(file, "002,001\n001,000\n");
+   fprintf(file, "003,002\n001,000\n");
    for(y = 0; y < height; y++) {
       for(x = 0; x < width; x++) {
          switch(maze[y * width + x]) {
