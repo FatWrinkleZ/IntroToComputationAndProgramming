@@ -9,15 +9,15 @@
 
 char bkspc;
 char newln;
-#ifdef _WIN32
-bkspc = 0x08;
-newln = 0x0A;
-#else
-bkspc = 0x1B;
-newln = '\n';
-#endif
 
 int main(int argc, char* argv[]){
+    #ifdef _WIN32
+    bkspc = 0x08;
+    newln = 0x0A;
+    #else
+    bkspc = 0x1B;
+    newln = '\n';
+    #endif
     #ifdef _WIN32
     printf("WINDOWS SYSTEM DETECTED\n");
     #else
