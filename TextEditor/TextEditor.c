@@ -53,7 +53,7 @@ int main(int argc, char* argv[]){
     #endif
     while(input != 0x1B){//while escape is not the key that is pressed
         #ifdef _WIN32
-        input; = getch();
+        input = getch();
         system("cls");
         #else
         input = wgetch(screen);//ncurses function that gets key press
