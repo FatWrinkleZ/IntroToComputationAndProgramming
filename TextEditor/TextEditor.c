@@ -7,6 +7,16 @@
 #endif
 #include <string.h>
 
+char bkspc;
+char newln;
+#ifdef _WIN32
+bkspc = 0x08;
+newln = 0x0A;
+#else
+bkspc = 0x1B;
+newln = '\n';
+#endif
+
 int main(int argc, char* argv[]){
     #ifdef _WIN32
     printf("WINDOWS SYSTEM DETECTED\n");
@@ -64,7 +74,7 @@ int main(int argc, char* argv[]){
             numCharacters--;//decrements numCharacters by 1
             fileContent[strlen(fileContent)-1] = '\0';//makes the end of the string (current length - 1)
             fileContent = (char*)realloc(fileContent, numCharacters * sizeof(char));//reduces the amount of memory allocated by 1 character
-        }else if (input != 0x1B && (input > 13||input == '\n')){
+        }else if (input != bkspc && (input > 13||input == newln)){
             numCharacters++;//increments numCharacters by 1
             fileContent = (char*)realloc(fileContent, numCharacters * sizeof(char));//expands the amount of memory allocated by 1 character
             sprintf(buf, "%c", input);//makes buff contain the input character
