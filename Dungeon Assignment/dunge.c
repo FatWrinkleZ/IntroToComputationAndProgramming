@@ -1,7 +1,7 @@
 #include "mazeGenerator.h"
 #include <string.h>	// in case you want strlen()
 #include <math.h>	// in case you want abs()
-#ifdef WIN32
+#ifdef _WIN32
 #include <conio.h>
 #endif
 
@@ -29,9 +29,9 @@ void SpawnGoal();
 
 #define LINESIZ	96
 
-//char *MAP;
+char *MAP;
 
-char MAP[60][60];
+//char MAP[60][60];
 
 // movement controls -- feel free to redefine
 #define MOV_N	'w'		// move North/Up
@@ -48,7 +48,7 @@ char MAP[60][60];
 
 int main(int argc, char *argv[])
 {
-	#ifdef WIN32
+	#ifdef _WIN32
 	printf("WINDOWS DETECTED : Setting Up With Windows Settings\n");
 	#else
 	printf("UNIX BASED SYSTEM DETECTED : SETTING UP WITH DEFAULTS\n");
@@ -74,12 +74,12 @@ void SpawnGoal(){
 
 void CheckForMovement(int dx, int dy){
 	int playerPos = (u_x + ((xSize)*u_y));
-	if((dy == 0 && (dx < 0 && u_x==0)) || (dx > 0 && u_x == xSize)){
+	/*if((dy == 0 && (dx < 0 && u_x==0)) || (dx > 0 && u_x == xSize)){
 		return;
 	}
 	if(((dy < 0 && u_y == 0) || (dy > 0 && u_y == ySize))){
 		return;
-	}
+	}*/
 	char TOMOVE = MAP[playerPos + dx + (dy*xSize)];
 	switch (TOMOVE)
 	{
@@ -95,7 +95,7 @@ void CheckForMovement(int dx, int dy){
 
 void PlayLoop(){
 	char input = 0;
-	#ifdef WIN32
+	#ifdef _WIN32
 	system("cls");
 	refresh_screen();
 	input = getch();
@@ -117,7 +117,7 @@ void PlayLoop(){
 		break;
 		case MOV_N:
 			dy--;
-			//dx++;
+			dx++;
 		break;
 		case MOV_E:
 			dx++;
@@ -127,7 +127,7 @@ void PlayLoop(){
 		break;
 		case MOV_S:
 			dy++;
-			//dx--;
+			dx--;
 		break;
 		case '\n' : // newline -- ignore
 			// do nothing
@@ -203,11 +203,11 @@ void init(int argc, FILE* fp)
 		strcat(MAP, buffer);
 		index++;
 	}
-	xSize-=2;
+	//xSize-=2;
 	totalSize = index;
 	printf("SIZE = %d (X) & %d(Y)\n", xSize, ySize);
 	printf("%s", MAP);
-	#ifdef WIN32
+	#ifdef _WIN32
 	return;
 	#endif
 	system ("/bin/stty raw");
@@ -217,8 +217,7 @@ void leave_game(char *msg)
 {
 	free(MAP);
 	fclose(fp);
-	#ifdef WIN32
-	#else
+	#ifndef _WIN32
 	system ("/bin/stty cooked");
 	#endif
 	printf("%s", msg);

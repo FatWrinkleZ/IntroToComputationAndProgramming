@@ -14,13 +14,10 @@ int main(int argc, char* argv[]){
     #ifdef _WIN32
     bkspc = 0x08;
     newln = 0x0A;
+    printf("WINDOWS SYSTEM DETECTED\n");
     #else
     bkspc = 0x1B;
     newln = '\n';
-    #endif
-    #ifdef _WIN32
-    printf("WINDOWS SYSTEM DETECTED\n");
-    #else
     WINDOW* screen = initscr();//ncurses method to have a mini window of its own(kinda, still in terminal)
     #endif
     char inFileName[32];//stores the file name
@@ -72,7 +69,7 @@ int main(int argc, char* argv[]){
         char buf[10];//holds the input character as a string to be concatenated later
         if(input == 0x7f){ //if it is the backspace hex key
             numCharacters--;//decrements numCharacters by 1
-            fileContent[strlen(fileContent)-1] = '\0';//makes the end of the string (current length - 1)
+            fileContent[numCharacters] = '\0';//makes the end of the string (current length - 1)
             fileContent = (char*)realloc(fileContent, numCharacters * sizeof(char));//reduces the amount of memory allocated by 1 character
         }else if (input != bkspc && (input > 13||input == newln)){
             numCharacters++;//increments numCharacters by 1
