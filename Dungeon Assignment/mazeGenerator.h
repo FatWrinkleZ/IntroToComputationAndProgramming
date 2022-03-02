@@ -39,6 +39,24 @@ void CarveMaze(char *maze, int width, int height, int x, int y) {
 
 }
 
+
+int SpawnGoal(char* maze, int width, int height, int* gx, int* gy){
+   int totalSize = (width*height) + height;
+	srand(time(0));
+	int x = 3+(rand()%(totalSize-3));
+	int yPos = x/width;
+	int xPos = x%(width);
+   //positions[0] = yPos;
+   //positions[1] = xPos;
+	x-= 2;
+	if((x >= totalSize || x <= 0 )&& (maze[x] != ' ' && maze[x-1] != ' ' && maze[x+1]!= ' ')){
+		return SpawnGoal(maze, width, height, gx, gy);
+	}
+   *gx=xPos;
+   *gy = yPos;
+	return x;
+}
+
 void GenerateMaze(char *maze, int width, int height) {
    int x, y;
    for(x = 0; x < width * height; x++) {
@@ -55,12 +73,24 @@ void GenerateMaze(char *maze, int width, int height) {
    maze[(height - 1) * width + (width - 2)] = 0;
 }
 
+void BUILD_WALLS(char* maze, int width, int height){
+   for(int i = 0; i < strlen(maze);i++){
+      if(i % width-1 == 0  || i % width -2 == 0 || i >= (height-1)*width){
+         maze[i] == '[';
+         maze[i+1] == ']';
+      }
+   }
+}
+
 FILE* SerializeMaze(char *maze, int width, int height, char* argv1){
     FILE* file = fopen(argv1, "w");
     //printf("Erroring Here");
    GenerateMaze(maze , width, height);
    int x, y;
-   fprintf(file, "003,002\n001,000\n");
+   int gx, gy;
+   BUILD_WALLS(maze, width, height);
+   SpawnGoal(maze, width, height, &gx, &gy);
+   fprintf(file, "002,002\n%03d,%03d\n", gx,gy);
    for(y = 0; y < height; y++) {
       for(x = 0; x < width; x++) {
          switch(maze[y * width + x]) {

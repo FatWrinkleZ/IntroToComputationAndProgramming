@@ -25,7 +25,7 @@ void leave_game(char *);
 FILE* Level(int, char **);
 void CheckForMovement(int, int);
 void PlayLoop();
-void SpawnGoal();
+//int SpawnGoal();
 
 #define LINESIZ	96
 
@@ -63,14 +63,20 @@ int main(int argc, char *argv[])
 	//leave_game("\nThanks for playing!\n");
 }
 
-void SpawnGoal(){
+/*int SpawnGoal(){
 	srand(time(0));
 	int x = 3+(rand()%(totalSize-3));
-	if(MAP[x] == ']' || MAP[x] == '['){
-		SpawnGoal();
+	int yPos = x/xSize;
+	int xPos = x%(xSize);
+	x-= 2;
+	if((x >= totalSize || x <= 0 )&& (MAP[x] != ' ' && MAP[x-1] != ' ' && MAP[x+1]!= ' ')){
+		return SpawnGoal();
 	}
+	g_x = xPos;
+	g_y = yPos;
 	GoalPos = x;
-}
+	return x;
+}*/
 
 void CheckForMovement(int dx, int dy){
 	int playerPos = (u_x + ((xSize)*u_y));
@@ -91,9 +97,13 @@ void CheckForMovement(int dx, int dy){
 	default:
 		break;
 	}
+	if (abs(playerPos - GoalPos) <= 1) {
+		leave_game("\n\n\tCongratulations! You found the MacGuffin!\n\n\n");
+	}
 }
 
 void PlayLoop(){
+	int playerPos = (u_x + ((xSize)*u_y));
 	char input = 0;
 	#ifdef _WIN32
 	system("cls");
@@ -104,15 +114,14 @@ void PlayLoop(){
 	refresh_screen();
 	input = getchar();
 	#endif
-	if (g_x == u_x && g_y == u_y) {
-		leave_game("\n\n\tCongratulations! You found the MacGuffin!\n\n\n");
-	}
 
 		int dx = 0;
 		int dy = 0;
 	switch(input){
 		case EXIT :	// save state and exit
-			save_state();
+			//save_state();
+			//rewind(fp);
+			fp = fopen(levelName,"r+");
 			leave_game("\nGood Bye.\n");
 		break;
 		case MOV_N:
@@ -137,13 +146,16 @@ void PlayLoop(){
 		break;
 	}
 	CheckForMovement(dx, dy);
-	
 
 	PlayLoop();
 }
 
 void save_state() 
 {
+	rewind(fp);
+	//fprintf(fp, "\r");
+	fprintf(fp, "%03d,%03d\n", u_x, u_y);
+	printf("\rSAVED PLAYER POS (%03d, %03d) TO FILE", u_x, u_y);
 	// write the current x,y coordinates of the user
 	// to the first line of the file, in the form XXX,YYY
 }
@@ -165,6 +177,8 @@ void refresh_screen()
 			}
 		}
 	}
+	printf("\nSIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d", xSize, ySize, totalSize);
+	printf("\r\nGoal pos is : (%d, %d) ----- GLOBAL POS = %d\n", g_x, g_y, GoalPos);
 }
 
 void init(int argc, FILE* fp)
@@ -205,8 +219,9 @@ void init(int argc, FILE* fp)
 	}
 	//xSize-=2;
 	totalSize = index;
-	printf("SIZE = %d (X) & %d(Y)\n", xSize, ySize);
+	printf("SIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d\n", xSize, ySize, totalSize);
 	printf("%s", MAP);
+	GoalPos = (g_y*xSize)+g_x;
 	#ifdef _WIN32
 	return;
 	#endif
@@ -215,6 +230,7 @@ void init(int argc, FILE* fp)
 
 void leave_game(char *msg)
 {
+	save_state();
 	free(MAP);
 	fclose(fp);
 	#ifndef _WIN32
