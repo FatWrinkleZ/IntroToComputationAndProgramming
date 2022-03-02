@@ -165,9 +165,9 @@ void refresh_screen()
 	int playerPos = (u_x + ((xSize)*u_y));
 	for(int i = 0; i < totalSize; i++){
 		if(i == playerPos){
-			printf("%c", 'P');
+			printf("%c", '@');
 			//i++;
-		}else if(i == GoalPos){printf("%c", 'M');}
+		}else if(i == GoalPos){printf("%c", '$');}
 		else{
 			if(MAP[i] == '\n'){
 				printf("\r");
@@ -177,8 +177,8 @@ void refresh_screen()
 			}
 		}
 	}
-	printf("\nSIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d", xSize, ySize, totalSize);
-	printf("\r\nGoal pos is : (%d, %d) ----- GLOBAL POS = %d\n", g_x, g_y, GoalPos);
+	//printf("\nSIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d", xSize, ySize, totalSize);
+	//printf("\r\nGoal pos is : (%d, %d) ----- GLOBAL POS = %d\n", g_x, g_y, GoalPos);
 }
 
 void init(int argc, FILE* fp)
