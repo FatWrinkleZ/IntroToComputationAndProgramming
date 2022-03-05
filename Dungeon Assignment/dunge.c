@@ -14,8 +14,6 @@ int xSize = 0;
 int ySize = 0;
 int totalSize = 0;
 int GoalPos = 0;
-//const int* MazeWidth = 60;
-//const int* MazeHeight = 30;
 
 // declaration of function prototypes
 void save_state();
@@ -25,13 +23,9 @@ void leave_game(char *);
 FILE* Level(int, char **);
 void CheckForMovement(int, int);
 void PlayLoop();
-//int SpawnGoal();
-
 #define LINESIZ	96
 
 char *MAP;
-
-//char MAP[60][60];
 
 // movement controls -- feel free to redefine
 #define MOV_N	'w'		// move North/Up
@@ -58,34 +52,11 @@ int main(int argc, char *argv[])
 	static const int y;
 	fp = Level(argc, argv);
 	init(argc, fp);
-	//SpawnGoal();
 	PlayLoop();
-	//leave_game("\nThanks for playing!\n");
 }
-
-/*int SpawnGoal(){
-	srand(time(0));
-	int x = 3+(rand()%(totalSize-3));
-	int yPos = x/xSize;
-	int xPos = x%(xSize);
-	x-= 2;
-	if((x >= totalSize || x <= 0 )&& (MAP[x] != ' ' && MAP[x-1] != ' ' && MAP[x+1]!= ' ')){
-		return SpawnGoal();
-	}
-	g_x = xPos;
-	g_y = yPos;
-	GoalPos = x;
-	return x;
-}*/
 
 void CheckForMovement(int dx, int dy){
 	int playerPos = (u_x + ((xSize)*u_y));
-	/*if((dy == 0 && (dx < 0 && u_x==0)) || (dx > 0 && u_x == xSize)){
-		return;
-	}
-	if(((dy < 0 && u_y == 0) || (dy > 0 && u_y == ySize))){
-		return;
-	}*/
 	char TOMOVE = MAP[playerPos + dx + (dy*xSize)];
 	switch (TOMOVE)
 	{
@@ -119,8 +90,6 @@ void PlayLoop(){
 		int dy = 0;
 	switch(input){
 		case EXIT :	// save state and exit
-			//save_state();
-			//rewind(fp);
 			fp = fopen(levelName,"r+");
 			leave_game("\nGood Bye.\n");
 		break;
@@ -153,7 +122,6 @@ void PlayLoop(){
 void save_state() 
 {
 	rewind(fp);
-	//fprintf(fp, "\r");
 	fprintf(fp, "%03d,%03d\n", u_x, u_y);
 	printf("\rSAVED PLAYER POS (%03d, %03d) TO FILE", u_x, u_y);
 	// write the current x,y coordinates of the user
@@ -183,13 +151,6 @@ void refresh_screen()
 
 void init(int argc, FILE* fp)
 {
-	/*if (argc != 2) {
-		printf("usage: %s <map file>\n", argv[0]);
-		exit(0);
-	}*/
-
-	//fp = fopen(argv[1], "r+");
-
 	if (fp == (FILE *)NULL) {
 		printf("error: cannot open game file for reading\n");
 		exit(0);
@@ -272,7 +233,5 @@ FILE* Level(int argc, char *argv[]){
 		printf("ERROR : UNRECOGNIZED INPUT!\n Trying Again...\n");
 		return Level(argc, argv);
 	}
-	//fclose(level);
-	//level = fopen(levelName, "r");
 	return level;
 }
