@@ -2,6 +2,12 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#ifdef WIN_32
+#include <Windows.h>
+#else
+#include <unistd.h>
+#endif
+#define MAX_GOAL_ITTERATIONS 250
 
 void CarveMaze(char *maze, int width, int height, int x, int y) {
 
@@ -40,21 +46,30 @@ void CarveMaze(char *maze, int width, int height, int x, int y) {
 }
 
 
-int SpawnGoal(char* maze, int width, int height, int* gx, int* gy){
-   int totalSize = (width*height) + height;
+int SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteration){
+   #ifdef WIN_32
+   Sleep(1);
+   #else
+   usleep(10);
+   #endif
+   int totalSize = (width*height) + height-width;
 	srand(time(0));
-	int x = 3+(rand()%(totalSize-3));
+	int x = 3+(rand()%(totalSize));
 	int yPos = x/width;
 	int xPos = x%(width);
    //positions[0] = yPos;
    //positions[1] = xPos;
 	x-= 2;
-	if((x >= totalSize || x <= 0 )&& (maze[x] != ' ' && maze[x-1] != ' ' && maze[x+1]!= ' ')){
-		return SpawnGoal(maze, width, height, gx, gy);
+   int tempInd = (xPos + (yPos * (width)));
+   printf("CURRENT MPOS IS (%d,%d) AT IND %d", xPos, yPos, x);
+	if(((x > 0 && x < totalSize-1) && (maze[x] != 1)) /*|| itteration >= MAX_GOAL_ITTERATIONS*/){
+         *gx=xPos-1;
+         *gy=yPos;
+	      return x;
 	}
-   *gx=xPos;
-   *gy = yPos;
-	return x;
+   itteration++;
+	return SpawnGoal(maze, width, height, gx, gy, itteration);
+
 }
 
 void GenerateMaze(char *maze, int width, int height) {
@@ -89,8 +104,8 @@ FILE* SerializeMaze(char *maze, int width, int height, char* argv1){
    int x, y;
    int gx, gy;
    BUILD_WALLS(maze, width, height);
-   SpawnGoal(maze, width, height, &gx, &gy);
-   fprintf(file, "002,002\n%03d,%03d\n", gx,gy);
+   SpawnGoal(maze, width, height, &gx, &gy, 0);
+   fprintf(file, "002,001\n%03d,%03d\n", gx,gy);
    for(y = 0; y < height; y++) {
       for(x = 0; x < width; x++) {
          switch(maze[y * width + x]) {

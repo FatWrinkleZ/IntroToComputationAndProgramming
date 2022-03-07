@@ -1,5 +1,4 @@
 #include "mazeGenerator.h"
-#include <string.h>	// in case you want strlen()
 #include <math.h>	// in case you want abs()
 #ifdef _WIN32
 #include <conio.h>
