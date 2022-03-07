@@ -7,7 +7,7 @@
 #else
 #include <unistd.h>
 #endif
-#define MAX_GOAL_ITTERATIONS 250
+#define MAX_GOAL_ITTERATIONS 1028
 
 void CarveMaze(char *maze, int width, int height, int x, int y) {
 
@@ -52,18 +52,18 @@ int SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteratio
    #else
    usleep(10);
    #endif
-   int totalSize = (width*height) + height-width;
+   int totalSize = (width*height) + height-(width*3);
 	srand(time(0));
-	int x = 3+(rand()%(totalSize));
+	int x = width+(rand()%(totalSize));
 	int yPos = x/width;
 	int xPos = x%(width);
    //positions[0] = yPos;
    //positions[1] = xPos;
 	x-= 2;
    int tempInd = (xPos + (yPos * (width)));
-   printf("CURRENT MPOS IS (%d,%d) AT IND %d", xPos, yPos, x);
-	if(((x > 0 && x < totalSize-1) && (maze[x] != 1)) /*|| itteration >= MAX_GOAL_ITTERATIONS*/){
-         *gx=xPos-1;
+   printf("\rSPAWNING GOAL... => ITTERATION %d => CURRENT MPOS IS (%d,%d) AT IND %d",itteration, xPos, yPos, x);
+	if(((x > 0 && x < totalSize) && (maze[tempInd] != 1)) /*|| itteration >= MAX_GOAL_ITTERATIONS*/){
+         *gx=xPos;
          *gy=yPos;
 	      return x;
 	}
