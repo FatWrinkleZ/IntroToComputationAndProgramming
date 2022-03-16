@@ -157,44 +157,61 @@ void refresh_screen()
 	int playerPos = (u_x + ((xSize)*u_y));
 	pPos = playerPos;
 	int nextY = 0;
-	for(int i = 0; i < totalSize; i++){
-		if(MAP[i] == '\n'){nextY++;}
-		int curY = (nextY);
-		int curX = ((i%xSize)+nextY);
-		int py = playerPos/xSize;
-		int px = playerPos%xSize;
-		if(abs(curX-px-py) <= difficulty*mul && abs(curY-u_y) <= difficulty*mul){
-			if(i == playerPos){
-				if(MAP[i-1] == '*' && MAP[i] == '*'){printf("[");printf("%c", '@');}
-				else if(MAP[i+1] == '*' && MAP[i] =='*'){printf("@]");}
-				else{printf("@");}
-			}else if(i == GoalPos){printf("%c", '$');}
-			else{
-				switch(MAP[i]){
-					case '\n':
+	if(hideScreen){
+		for(int i = 0; i < totalSize; i++){
+			if(MAP[i] == '\n'){nextY++;}
+			int curY = (nextY);
+			int curX = ((i%xSize)+nextY);
+			int py = playerPos/xSize;
+			int px = playerPos%xSize;
+			if(abs(curX-px-py) <= difficulty*mul && abs(curY-u_y) <= difficulty*mul){
+				if(i == playerPos){
+					if(MAP[i-1] == '*' && MAP[i] == '*'){printf("[");printf("%c", '@');}
+					else if(MAP[i+1] == '*' && MAP[i] =='*'){printf("@]");}
+					else{printf("@");}
+				}else if(i == GoalPos){printf("%c", '$');}
+				else{
+					switch(MAP[i]){
+						case '\n':
+						printf("\r");
+						printf("\n");
+						break;
+						case '%':
+						printf("+");
+						break;
+						case '*':
+						if(MAP[i+1] == '*' && i+1 != playerPos){
+							printf("[]");
+							i++;
+						}
+						break;
+						default:
+						printf("%c", MAP[i]);
+						break;
+					}
+				}
+			}else{
+				if(MAP[i] == '\n'){
 					printf("\r");
 					printf("\n");
-					break;
-					case '%':
-					printf("+");
-					break;
-					case '*':
-					if(MAP[i+1] == '*' && i+1 != playerPos){
-						printf("[]");
-						i++;
-					}
-					break;
-					default:
-					printf("%c", MAP[i]);
-					break;
-				}
+				}else{printf("%c",' ');}
 			}
-		}else{
-			if(MAP[i] == '\n'){
+		}
+	}else{
+		for(int i = 0; i < totalSize; i++){
+			if(i == playerPos){
+				printf("@");
+			}else if (i == GoalPos){
+				printf("$");
+			}else if(MAP[i] == '\n'){
 				printf("\r");
 				printf("\n");
-			}else{printf("%c",' ');}
+			}
+			else{
+				printf("%c", MAP[i]);
+			}
 		}
+		hideScreen = true;
 	}
 	//printf("\nSIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d", xSize, ySize, totalSize);
 	//printf("\r\nGoal pos is : (%d, %d) ----- GLOBAL POS = %d\n", g_x, g_y, GoalPos);
