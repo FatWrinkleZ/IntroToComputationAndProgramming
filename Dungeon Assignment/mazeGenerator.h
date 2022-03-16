@@ -73,12 +73,24 @@ int SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteratio
 }
 
 void GenerateMaze(char *maze, int width, int height) {
+   srand(time(0));
    int x, y;
    for(x = 0; x < width * height; x++) {
       maze[x] = 1;
+      int r = rand()%100 + 1;
+
+      if(r % 80 == 0){
+         maze[x] =4;
+      }
+      if(r%60 == 0){
+         maze[x] =3;
+      }
+      if(r % 70 == 0){
+         maze[x] = 2;
+      }
    }
    maze[1 * width + 1] = 0;
-   srand(time(0));
+   
    for(y = 1; y < height; y += 2) {
       for(x = 1; x < width; x += 2) {
          CarveMaze(maze, width, height, x, y);
@@ -110,6 +122,9 @@ FILE* SerializeMaze(char *maze, int width, int height, char* argv1){
       for(x = 0; x < width; x++) {
          switch(maze[y * width + x]) {
          case 1:  fprintf(file, "[]");  break;
+         case 2: fprintf(file, "**"); break;
+         case 3: fprintf(file, "++"); break;
+         case 4: fprintf(file, "%%");fprintf(file, "%%"); break;
          default: 
          fprintf(file, "  ");  
          break;

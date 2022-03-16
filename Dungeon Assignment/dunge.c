@@ -3,7 +3,16 @@
 #ifdef _WIN32
 #include <conio.h>
 #endif
+#include <stdbool.h>
+/*
+-------THINGS TO CONSIDER IN CASE OF BUGS----------
+> the maze is generated and allocated to memory at runtime
+> I am parsing a 2D position from a 1D character array
+> the macguffin, hidden door, locked door, and unlocked doors are generated along with maze generation
+> program was written to also compile on windows as well and work with no extra code
+*/
 
+bool hideScreen=true;
 // globals
 int u_x=1, u_y=1;	// user x,y location on grid
 int g_x=1, g_y=1;	// macguffin x,y location on grid (g for "goal")
@@ -13,6 +22,7 @@ int xSize = 0;
 int ySize = 0;
 int totalSize = 0;
 int GoalPos = 0;
+int pPos = 0;
 
 // declaration of function prototypes
 void save_state();
@@ -23,6 +33,9 @@ FILE* Level(int, char **);
 void CheckForMovement(int, int);
 void PlayLoop();
 #define LINESIZ	96
+
+
+int difficulty = 1;
 
 char *MAP;
 
@@ -36,7 +49,18 @@ char *MAP;
 #define AMOV_E	'6'		// Alternative move East/Right
 #define AMOV_W	'4'		// Alternative move West/Left
 #define EXIT	'.'
+#define mul 3
 
+int selectDifficulty(){
+	printf("What difficulty do you want to play at?\n EXHARD = 1, HARD = 2 , NORMAL = 2, EASY = 3, EXEASY = 4\n\tDIFFICULTY : ");
+	int selection = 0;
+	scanf("%d", &selection);
+	if(selection >= 1 && selection<= 4){
+		return selection;
+	}
+	printf("\nERROR : INPUT WAS NOT AN OPTION!\n");
+	return selectDifficulty();
+}
 
 
 int main(int argc, char *argv[])
@@ -50,6 +74,7 @@ int main(int argc, char *argv[])
 	static const int x;
 	static const int y;
 	fp = Level(argc, argv);
+	difficulty = selectDifficulty();
 	init(argc, fp);
 	PlayLoop();
 }
@@ -57,15 +82,9 @@ int main(int argc, char *argv[])
 void CheckForMovement(int dx, int dy){
 	int playerPos = (u_x + ((xSize)*u_y));
 	char TOMOVE = MAP[playerPos + dx + (dy*xSize)];
-	switch (TOMOVE)
-	{
-	case ' ':
-			u_x+=dx;
-			u_y+=dy;
-		break;
-	
-	default:
-		break;
+	if(TOMOVE == ' ' || TOMOVE=='%' || TOMOVE == '*' || TOMOVE == '$'){
+		u_x+=dx;
+		u_y+=dy;
 	}
 	if (abs(playerPos - GoalPos) <= 1) {
 		leave_game("\n\n\tCongratulations! You found the MacGuffin!\n\n\n");
@@ -106,6 +125,9 @@ void PlayLoop(){
 			dy++;
 			dx--;
 		break;
+		case 'h':
+		hideScreen = false;
+		break;
 		case '\n' : // newline -- ignore
 			// do nothing
 		break;
@@ -120,6 +142,9 @@ void PlayLoop(){
 
 void save_state() 
 {
+	u_y = pPos/xSize;
+	u_x = pPos%xSize+u_y;
+	fp = fopen(levelName,"r+");
 	rewind(fp);
 	fprintf(fp, "%03d,%03d\n", u_x, u_y);
 	printf("\rSAVED PLAYER POS (%03d, %03d) TO FILE", u_x, u_y);
@@ -130,18 +155,45 @@ void save_state()
 void refresh_screen()
 {
 	int playerPos = (u_x + ((xSize)*u_y));
+	pPos = playerPos;
+	int nextY = 0;
 	for(int i = 0; i < totalSize; i++){
-		if(i == playerPos){
-			printf("%c", '@');
-			//i++;
-		}else if(i == GoalPos){printf("%c", '$');}
-		else{
+		if(MAP[i] == '\n'){nextY++;}
+		int curY = (nextY);
+		int curX = ((i%xSize)+nextY);
+		int py = playerPos/xSize;
+		int px = playerPos%xSize;
+		if(abs(curX-px-py) <= difficulty*mul && abs(curY-u_y) <= difficulty*mul){
+			if(i == playerPos){
+				if(MAP[i-1] == '*' && MAP[i] == '*'){printf("[");printf("%c", '@');}
+				else if(MAP[i+1] == '*' && MAP[i] =='*'){printf("@]");}
+				else{printf("@");}
+			}else if(i == GoalPos){printf("%c", '$');}
+			else{
+				switch(MAP[i]){
+					case '\n':
+					printf("\r");
+					printf("\n");
+					break;
+					case '%':
+					printf("+");
+					break;
+					case '*':
+					if(MAP[i+1] == '*' && i+1 != playerPos){
+						printf("[]");
+						i++;
+					}
+					break;
+					default:
+					printf("%c", MAP[i]);
+					break;
+				}
+			}
+		}else{
 			if(MAP[i] == '\n'){
 				printf("\r");
 				printf("\n");
-			}else{
-				printf("%c", MAP[i]);
-			}
+			}else{printf("%c",' ');}
 		}
 	}
 	//printf("\nSIZE = %d (X) & %d(Y) ----- TOTAL COUNT = %d", xSize, ySize, totalSize);
