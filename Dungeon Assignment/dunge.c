@@ -5,11 +5,14 @@
 #endif
 #include <stdbool.h>
 /*
+
 -------THINGS TO CONSIDER IN CASE OF BUGS----------
+
 > the maze is generated and allocated to memory at runtime
 > I am parsing a 2D position from a 1D character array
 > the macguffin, hidden door, locked door, and unlocked doors are generated along with maze generation
 > program was written to also compile on windows as well and work with no extra code
+
 */
 
 bool hideScreen=true;
@@ -52,10 +55,10 @@ char *MAP;
 #define mul 3
 
 int selectDifficulty(){
-	printf("What difficulty do you want to play at?\n EXHARD = 1, HARD = 2 , NORMAL = 2, EASY = 3, EXEASY = 4\n\tDIFFICULTY : ");
+	printf("What difficulty do you want to play at?\n EXHARD = 1, HARD = 2, NORMAL = 3, EASY = 4, EXEASY = 5\n\tDIFFICULTY : ");
 	int selection = 0;
 	scanf("%d", &selection);
-	if(selection >= 1 && selection<= 4){
+	if(selection >= 1 && selection<= 5){
 		return selection;
 	}
 	printf("\nERROR : INPUT WAS NOT AN OPTION!\n");
@@ -92,7 +95,7 @@ void CheckForMovement(int dx, int dy){
 }
 
 void PlayLoop(){
-	int playerPos = (u_x + ((xSize)*u_y));
+	int playerPos = (u_x + ((xSize)*u_y));//converts the 2D position into an index in the MAP array
 	char input = 0;
 	#ifdef _WIN32
 	system("cls");
@@ -108,10 +111,9 @@ void PlayLoop(){
 		int dy = 0;
 	switch(input){
 		case EXIT :	// save state and exit
-			fp = fopen(levelName,"r+");
 			leave_game("\nGood Bye.\n");
 		break;
-		case MOV_N:
+		case MOV_N://adding to x deals with \n not being included in xSize
 			dy--;
 			dx++;
 		break;
@@ -121,7 +123,7 @@ void PlayLoop(){
 		case MOV_W:
 			dx--;
 		break;
-		case MOV_S:
+		case MOV_S://subtracting from x deals with \n not being included in xSize
 			dy++;
 			dx--;
 		break;
@@ -140,7 +142,7 @@ void PlayLoop(){
 	PlayLoop();
 }
 
-void save_state() 
+void save_state() //saves the player position
 {
 	u_y = pPos/xSize;
 	u_x = pPos%xSize+u_y;
@@ -152,10 +154,10 @@ void save_state()
 	// to the first line of the file, in the form XXX,YYY
 }
 
-void refresh_screen()
+void refresh_screen()//function renders the screen and does it based on difficulty
 {
-	int playerPos = (u_x + ((xSize)*u_y));
-	pPos = playerPos;
+	int playerPos = (u_x + ((xSize)*u_y));//converts @D pos to index in MAP array
+	pPos = playerPos;//saves it to global variable for saving(i shouldve had it be global from the get-go but im too lazy to change everywhere i reference playerPos)
 	int nextY = 0;
 	if(hideScreen){
 		for(int i = 0; i < totalSize; i++){
@@ -231,7 +233,7 @@ void init(int argc, FILE* fp)
 	char buf[10];
 	int doneX = 0;
 	int index = 0;
-	MAP = (char*)malloc(sizeof(char));
+	MAP = (char*)malloc(sizeof(char));//allocates one byte of type char* to MAP
 	while(fscanf(fp, "%c", buf) > 0){
 		if(doneX != 1){
 			xSize++;
@@ -240,10 +242,10 @@ void init(int argc, FILE* fp)
 			ySize++;
 			doneX = 1;
 		}
-		MAP = (char*)realloc(MAP,sizeof(char) + index*sizeof(char));
+		MAP = (char*)realloc(MAP,sizeof(char) + index*sizeof(char));//expands memory allocated to MAP by 1 character
 		char buffer[2];
 		sprintf(buffer, "%c", buf[0]);
-		strcat(MAP, buffer);
+		strcat(MAP, buffer);//adds character to the last index of map
 		index++;
 	}
 	//xSize-=2;

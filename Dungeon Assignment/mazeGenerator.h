@@ -46,7 +46,7 @@ void CarveMaze(char *maze, int width, int height, int x, int y) {
 }
 
 
-int SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteration){
+void SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteration){
    #ifdef WIN_32
    Sleep(1);
    #else
@@ -61,14 +61,17 @@ int SpawnGoal(char* maze, int width, int height, int* gx, int* gy, int itteratio
    //positions[1] = xPos;
 	x-= 2;
    int tempInd = (xPos + (yPos * (width)));
-   printf("\rSPAWNING GOAL... => ITTERATION %d => CURRENT MPOS IS (%d,%d) AT IND %d",itteration, xPos, yPos, x);
-	if(((x > 0 && x < totalSize) && (maze[tempInd] != 1)) /*|| itteration >= MAX_GOAL_ITTERATIONS*/){
-         *gx=xPos;
-         *gy=yPos;
-	      return x;
+	while(((x < 0 && x > totalSize) && (maze[tempInd] == 1)) /*|| itteration >= MAX_GOAL_ITTERATIONS*/){
+      x = width + (rand()%totalSize);
+      yPos = x/width;
+      xPos = x%width;
+      printf("\rSPAWNING GOAL... => ITTERATION %d => CURRENT MPOS IS (%d,%d) AT IND %d",itteration, xPos, yPos, x);
+	      //return x;
 	}
    itteration++;
-	return SpawnGoal(maze, width, height, gx, gy, itteration);
+         *gx=xPos;
+         *gy=yPos;
+	//return SpawnGoal(maze, width, height, gx, gy, itteration);
 
 }
 
