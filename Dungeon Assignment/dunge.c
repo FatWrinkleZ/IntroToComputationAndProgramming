@@ -4,12 +4,13 @@
 #include <conio.h>
 #endif
 #include <stdbool.h>
+
 /*
 
 -------THINGS TO CONSIDER IN CASE OF BUGS----------
 
 > the maze is generated and allocated to memory at runtime
-> I am parsing a 2D position from a 1D character array
+> I am parsing a 2D position from a 1D character array, allocating a 2d pointer is hard for me to wrap my mind around
 > the macguffin, hidden door, locked door, and unlocked doors are generated along with maze generation
 > program was written to also compile on windows as well and work with no extra code
 
