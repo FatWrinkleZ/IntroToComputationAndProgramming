@@ -150,7 +150,7 @@ char* major_to_str(int major){
 		return "Electrical Engineering";
 		break;
 		case MAJ_MA:
-		return "Master of Arts";
+		return "Mathematics";
 		break;
 		case MAJ_ME:
 		return "Mechanical Engineering";
