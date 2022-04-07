@@ -12,7 +12,7 @@
 #define PIXEL_SIZE_POS 28
 
 typedef struct{
-    unsigned char b,g,r;
+    unsigned char g,r,b;
 }pixel;
 
 
@@ -20,6 +20,7 @@ int getFileSize(FILE* file);
 void blur(int row, int col, pixel img[row][col]);
 void grey(int row, int col, pixel img[row][col]);
 void rgb(char *cmd, int row, int col, pixel img[row][col]);
+void clampColor(pixel*p);
 
 int main(int argc, char* argv[]){
     int row, col;
@@ -85,17 +86,26 @@ int main(int argc, char* argv[]){
 void rgb(char *cmd, int row, int col, pixel img[row][col]){
     for(int i = 0; i < row; i++){
         for(int j = 0; j < col; j++){
+            pixel p = img[i][j];
             if(strchr(cmd, 'r')!= (char*)NULL){
-                img[i][j].r += 30;
+                p.r += 30;
             }
             if(strchr(cmd, 'g')!= (char*)NULL){
-                img[i][j].g += 30;
+                p.g += 30;
             }
             if(strchr(cmd, 'b')!= (char*)NULL){
-                img[i][j].b += 30;
+                p.b += 30;
             }
+            clampColor(&p);
+            img[i][j] = p;
         }
     }
+}
+
+void clampColor(pixel* p){
+    p->r = (unsigned char)(((p->r>254 || p->r < 0) ? 254 : p->r)&0xFF);
+    p->g = (unsigned char)(((p->g>254 || p->g < 0) ? 254 : p->g)&0xFF);
+    p->b = (unsigned char)(((p->b>254 || p->b < 0) ? 254 : p->b)&0xFF);
 }
 
 void grey(int row, int col, pixel img[row][col]){
@@ -126,43 +136,43 @@ void blur(int row, int col, pixel img[row][col]){
                 b+=img[i-1][j-1].b;
                 ct++;
             }
-            else if(i-1 >= 0 && j+1 < col){
+             if(i-1 >= 0 && j+1 < col){
                 r+=img[i-1][j+1].r;
                 g+=img[i-1][j+1].g;
                 b+=img[i-1][j+1].b;
                 ct++;
             }
-            else if(i+1 < row && j-1 >=0){
+             if(i+1 < row && j-1 >=0){
                 ct++;
                 r+=img[i+1][j-1].r;
                 g+=img[i+1][j-1].g;
                 b+=img[i+1][j-1].b;
             }
-            else if(i+1 < row && j+1 <col){
+             if(i+1 < row && j+1 <col){
                 r+=img[i+1][j+1].r;
                 g+=img[i+1][j+1].g;
                 b+=img[i+1][j+1].b;
                 ct++;
             }
-            else if(i-1 >= 0){
+            if(i-1 >= 0){
                 r+=img[i-1][j].r;
                 g+=img[i-1][j].g;
                 b+=img[i-1][j].b;
                 ct++;
             }
-            else if(j-1 >0){
+             if(j-1 >0){
                 r+=img[i][j-1].r;
                 g+=img[i][j-1].g;
                 b+=img[i][j-1].b;
                 ct++;
             }
-            else if(i+1 < row){
+             if(i+1 < row){
                 ct++;
                 r+=img[i+1][j].r;
                 g+=img[i+1][j].g;
                 b+=img[i+1][j].b;
             }
-            else if(j+1 < col){
+             if(j+1 < col){
                 ct++;
                 r+=img[i][j+1].r;
                 g+=img[i][j+1].g;
