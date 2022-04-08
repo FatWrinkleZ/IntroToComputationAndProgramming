@@ -20,7 +20,6 @@ int getFileSize(FILE* file);
 void blur(int row, int col, pixel img[row][col]);
 void grey(int row, int col, pixel img[row][col]);
 void rgb(char *cmd, int row, int col, pixel img[row][col]);
-void clampColor(pixel*p);
 
 int main(int argc, char* argv[]){
     int row, col;
@@ -56,11 +55,13 @@ int main(int argc, char* argv[]){
     pixel img[Num_Rows][Num_Cols];
     fseek(in, Header, SEEK_SET);
     for(row = 0; row<Num_Rows;row++){
-        fread(&img[row][0], Num_Cols, sizeof(pixel), in);
+        fread(&img[row][0], Num_Cols, (bitsPerPixel/8), in);
     }
     if(strchr(cmd, 'a') != (char*)NULL){
         int num = atol(cmd+1);
-        blur(Num_Rows, Num_Cols, img);
+        for(int i = 0; i < num; i++){
+            blur(Num_Rows, Num_Cols, img);
+        }
     }else if (strchr(cmd, 'y')!=(char*)NULL){
         grey(Num_Rows, Num_Cols, img);
     }else if(strchr(cmd, 'r') != (char*)NULL ||
@@ -86,26 +87,26 @@ int main(int argc, char* argv[]){
 void rgb(char *cmd, int row, int col, pixel img[row][col]){
     for(int i = 0; i < row; i++){
         for(int j = 0; j < col; j++){
-            pixel p = img[i][j];
+            pixel* p = &img[i][j];
+            int r=p->r,g=p->g,b=p->b;
             if(strchr(cmd, 'r')!= (char*)NULL){
-                p.r += 30;
+                r += 30;
             }
             if(strchr(cmd, 'g')!= (char*)NULL){
-                p.g += 30;
+                g += 30;
             }
             if(strchr(cmd, 'b')!= (char*)NULL){
-                p.b += 30;
+                b += 30;
             }
-            clampColor(&p);
-            img[i][j] = p;
+            r = (r>255?255:r);
+            b = (b>255?255:b);
+            g = (g>255?255:g);
+            p->r = (unsigned char)((r));
+            p->g = (unsigned char)((g));
+            p->b = (unsigned char)((b));
+            //if(j == col-1 && i == row-1){printf("COLOR OF LAST PIXEL IS %d %d %d\n", p->r, p->g, p->b);}
         }
     }
-}
-
-void clampColor(pixel* p){
-    p->r = (unsigned char)(((p->r>254 || p->r < 0) ? 254 : p->r)&0xFF);
-    p->g = (unsigned char)(((p->g>254 || p->g < 0) ? 254 : p->g)&0xFF);
-    p->b = (unsigned char)(((p->b>254 || p->b < 0) ? 254 : p->b)&0xFF);
 }
 
 void grey(int row, int col, pixel img[row][col]){
