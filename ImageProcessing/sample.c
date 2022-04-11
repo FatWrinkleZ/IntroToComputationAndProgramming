@@ -15,8 +15,6 @@ typedef struct{
     unsigned char g,r,b;
 }pixel;
 
-
-int getFileSize(FILE* file);
 void blur(int row, int col, pixel img[row][col]);
 void grey(int row, int col, pixel img[row][col]);
 void rgb(char *cmd, int row, int col, pixel img[row][col]);
@@ -185,11 +183,4 @@ void blur(int row, int col, pixel img[row][col]){
             img[i][j].b = (unsigned char)((b/ct)&0xFF);
         }
     }
-}
-
-int getFileSize(FILE* file){
-    fseek(file, 0, SEEK_END);
-    int end = ftell(file);
-    rewind(file);
-    return end;
 }
